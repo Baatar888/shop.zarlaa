@@ -1,11 +1,9 @@
 "use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Search, Menu, X, User } from "lucide-react";
-import CartButton from "./CartButton";
 
 const categories = [
   { name: "Хувцас", slug: "clothing" },
@@ -29,7 +27,9 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-4 h-16">
+        <div className="flex items-center justify-between gap-4 h-16">
+          
+          {/* Logo Хэсэг */}
           <Link href="/" className="flex-shrink-0">
             <Image
               src="/logo.png"
@@ -41,7 +41,8 @@ export default function Navbar() {
             />
           </Link>
 
-          <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
+          {/* Хайлтын хэсэг */}
+          <form onSubmit={handleSearch} className="flex-1 max-w-2xl hidden sm:block">
             <div className="relative flex items-center">
               <input
                 type="text"
@@ -62,16 +63,17 @@ export default function Navbar() {
             </div>
           </form>
 
-          <div className="flex items-center gap-1 flex-shrink-0">
+          {/* Баруун талын цэс */}
+          <div className="flex items-center gap-3">
             <Link
               href="/auth/login"
               className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg
-                text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                text-sm text-gray-600 hover:bg-gray-100 transition-colors"
             >
               <User size={16} />
-              <span className="hidden md:inline">Нэвтрэх</span>
+              <span>Нэвтрэх</span>
             </Link>
-            <CartButton />
+
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="sm:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
@@ -81,6 +83,7 @@ export default function Navbar() {
           </div>
         </div>
 
+        {/* Ангилалууд */}
         <nav className="hidden sm:flex items-center gap-1 py-2 border-t border-gray-100 overflow-x-auto">
           <Link
             href="/products"
@@ -102,6 +105,7 @@ export default function Navbar() {
         </nav>
       </div>
 
+      {/* Мобайл цэс */}
       {menuOpen && (
         <div className="sm:hidden border-t border-gray-100 bg-white px-4 py-4 space-y-3">
           <form onSubmit={handleSearch}>
@@ -132,13 +136,6 @@ export default function Navbar() {
               </Link>
             ))}
           </div>
-          <Link
-            href="/auth/login"
-            className="flex items-center gap-2 py-2 text-sm text-gray-600"
-            onClick={() => setMenuOpen(false)}
-          >
-            <User size={16} /> Нэвтрэх / Бүртгүүлэх
-          </Link>
         </div>
       )}
     </header>
