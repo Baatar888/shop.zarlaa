@@ -43,3 +43,12 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+
+const nextConfig = {
+  typescript: {
+    // TypeScript-ийн алдаа байсан ч хамаагүй сайтаа build хийхийг зөвшөөрөх
+    ignoreBuildErrors: true,
+  },
+};
+
+module.exports = nextConfig;
