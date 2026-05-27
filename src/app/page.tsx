@@ -52,23 +52,7 @@ export default async function HomePage() {
         />
       )}
 
-      {/* Vendor CTA */}
-      <section className="rounded-2xl bg-gray-950 text-white p-8 sm:p-12
-        flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div>
-          <h2 className="text-2xl font-black mb-2">Дэлгүүрээ нээхэд бэлэн үү?</h2>
-          <p className="text-gray-400 text-sm">
-            Өнөөдрөөс эхлэн өөрийн бараагаа байршуулж, олон мянган худалдан авагчдад хүрнэ.
-          </p>
-        </div>
-        <a
-          href="/vendor/register"
-          className="flex-shrink-0 px-8 py-3 bg-orange-500 hover:bg-orange-600
-            text-white font-bold rounded-xl transition-colors whitespace-nowrap"
-        >
-          Одоо эхлэх →
-        </a>
-      </section>
+
     </div>
   );
 }

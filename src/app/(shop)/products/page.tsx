@@ -188,7 +188,7 @@ export default async function ProductsPage({
             </div>
           </div>
 
-          <ProductGrid products={paginated as any} />
+          <ProductGrid products={paginated} />
 
           {/* Pagination */}
           {totalPages > 1 && (
