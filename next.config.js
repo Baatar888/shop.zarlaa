@@ -44,9 +44,11 @@ const nextConfig = {
 
 module.exports = nextConfig;
 
+
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
-    // TypeScript-ийн алдаа байсан ч хамаагүй сайтаа build хийхийг зөвшөөрөх
+    // TypeScript-ийн алдааг үл тоомсорлож сайтаа асаахыг зөвшөөрөх
     ignoreBuildErrors: true,
   },
 };
