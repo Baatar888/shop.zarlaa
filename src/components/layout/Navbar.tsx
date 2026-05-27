@@ -28,10 +28,8 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-      {/* Main nav */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4 h-16">
-          {/* Logo */}
           <Link href="/" className="flex-shrink-0">
             <Image
               src="/logo.png"
@@ -43,7 +41,6 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* Search */}
           <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
             <div className="relative flex items-center">
               <input
@@ -65,7 +62,6 @@ export default function Navbar() {
             </div>
           </form>
 
-          {/* Actions */}
           <div className="flex items-center gap-1 flex-shrink-0">
             <Link
               href="/auth/login"
@@ -75,10 +71,7 @@ export default function Navbar() {
               <User size={16} />
               <span className="hidden md:inline">Нэвтрэх</span>
             </Link>
-
-            {/* CartButton тусдаа client component — hydration алдаагүй */}
             <CartButton />
-
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="sm:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
@@ -88,8 +81,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Category nav */}
-        <nav className="hidden sm:flex items-center gap-1 py-2 border-t border-gray-100 overflow-x-auto scrollbar-hide">
+        <nav className="hidden sm:flex items-center gap-1 py-2 border-t border-gray-100 overflow-x-auto">
           <Link
             href="/products"
             className="flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-orange-600
@@ -110,7 +102,6 @@ export default function Navbar() {
         </nav>
       </div>
 
-      {/* Mobile menu */}
       {menuOpen && (
         <div className="sm:hidden border-t border-gray-100 bg-white px-4 py-4 space-y-3">
           <form onSubmit={handleSearch}>
