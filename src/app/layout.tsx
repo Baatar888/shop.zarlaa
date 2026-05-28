@@ -12,15 +12,10 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Shop Zarlaa — Монголын онлайн зах",
-    template: "%s | Shop Zarlaa",
+    default: "MMART — Монголын онлайн зах",
+    template: "%s | MMART",
   },
   description: "Монголын хамгийн том онлайн худалдааны платформ.",
-  icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
-    apple: "/favicon.png",
-  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
