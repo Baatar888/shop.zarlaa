@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Search, Menu, X, User } from "lucide-react";
@@ -27,19 +28,19 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-      {/* Top bar */}
-      <div className="bg-gray-950 text-gray-300 text-xs py-1.5 text-center tracking-wide">
-        Монгол даяар хүргэлт • Найдвартай худалдаа • 7 хоногт буцаалт
-      </div>
-
       {/* Main nav */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4 h-16">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <span className="text-2xl font-black tracking-tighter text-gray-950">
-              MMART<span className="text-orange-500">.</span>
-            </span>
+            <Image
+              src="/logo.png"
+              alt="Shop Zarlaa"
+              width={160}
+              height={44}
+              priority
+              className="h-11 w-auto"
+            />
           </Link>
 
           {/* Search */}
@@ -106,14 +107,6 @@ export default function Navbar() {
               {cat.name}
             </Link>
           ))}
-          <Link
-            href="/vendor/register"
-            className="flex-shrink-0 ml-auto px-3 py-1.5 text-xs text-gray-500
-              border border-dashed border-gray-300 rounded-full hover:border-orange-400
-              hover:text-orange-500 transition-colors whitespace-nowrap"
-          >
-            + Дэлгүүр нээх
-          </Link>
         </nav>
       </div>
 
