@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Plus, Search, Edit3, Trash2, Star, Eye, EyeOff, X, Check } from "lucide-react";
+import { Plus, Search, Edit3, Trash2, Star, Eye, EyeOff, X, Check, Package } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 
