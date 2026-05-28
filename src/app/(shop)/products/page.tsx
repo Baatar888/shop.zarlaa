@@ -69,7 +69,7 @@ export default function ProductsPage({
       const db = ((b.originalPrice - b.salePrice) / b.originalPrice) * 100;
       return db - da;
     });
-  else products.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  else products.sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""));
 
   const total = products.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
