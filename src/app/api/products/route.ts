@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
       const db = ((b.originalPrice - b.salePrice) / b.originalPrice) * 100;
       return db - da;
     });
-  else products.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  else products.sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""));
 
   const total = products.length;
   const paginated = products.slice((page - 1) * limit, page * limit);
