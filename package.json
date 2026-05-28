@@ -9,7 +9,8 @@
     "lint": "next lint",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "db:seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "next": "14.2.5",
@@ -37,5 +38,8 @@
     "eslint": "8.57.0",
     "eslint-config-next": "14.2.5",
     "@types/nodemailer": "^6.4.15"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   }
 }

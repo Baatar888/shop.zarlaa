@@ -5,10 +5,16 @@ export default function Footer() {
   return (
     <footer className="bg-gray-950 text-gray-400 mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 mb-10">
           <div className="col-span-2 sm:col-span-1">
             <Link href="/">
-              <Image src="/logo.png" alt="Shop Zarlaa" width={140} height={38} className="h-9 w-auto brightness-0 invert" />
+              <Image
+                src="/logo.png"
+                alt="Shop Zarlaa"
+                width={140}
+                height={38}
+                className="h-9 w-auto brightness-0 invert"
+              />
             </Link>
             <p className="mt-3 text-sm leading-relaxed">
               Монголын хамгийн том онлайн захын платформ.
@@ -22,14 +28,6 @@ export default function Footer() {
                 { label: "Бүх бараа", href: "/products" },
                 { label: "Захиалга хянах", href: "/dashboard/orders" },
                 { label: "Буцаалт", href: "/returns" },
-              ],
-            },
-            {
-              title: "Худалдагч",
-              links: [
-                { label: "Дэлгүүр нээх", href: "/vendor/register" },
-                { label: "Бараа нэмэх", href: "/vendor/products/new" },
-                { label: "Борлуулалт", href: "/vendor" },
               ],
             },
             {

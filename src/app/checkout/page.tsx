@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/utils";
 import Image from "next/image";
-import { CheckCircle, Copy, Loader2, Phone, MapPin, CreditCard } from "lucide-react";
+import { CheckCircle, Copy, Loader2, Phone, MapPin, CreditCard, Send } from "lucide-react";
 
 type Step = "info" | "payment" | "success";
 type PayMethod = "qpay" | "socialpay" | "khanbank" | "golomt";
@@ -51,6 +51,8 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [orderId, setOrderId] = useState("");
   const [copied, setCopied] = useState(false);
+  const [savedItems, setSavedItems] = useState<any[]>([]);
+  const [savedCustomer, setSavedCustomer] = useState<any>(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -72,6 +74,8 @@ export default function CheckoutPage() {
 
   const handleSubmit = async () => {
     setLoading(true);
+    const currentItems = [...items];
+    const currentCustomer = { ...form };
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
@@ -93,6 +97,8 @@ export default function CheckoutPage() {
       const data = await res.json();
 
       if (data.orderId) {
+        setSavedItems(currentItems);
+        setSavedCustomer(currentCustomer);
         setOrderId(data.orderId);
         clearCart();
         setStep("success");
@@ -117,7 +123,6 @@ export default function CheckoutPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      {/* Steps - PC & Mobile friendly */}
       <div className="flex items-center mb-8">
         {[
           { num: 1, label: "Мэдээлэл", key: "info" },
@@ -149,10 +154,17 @@ export default function CheckoutPage() {
       </div>
 
       {step === "success" ? (
-        <SuccessScreen orderId={orderId} payMethod={payMethod} total={total} onCopy={handleCopy} copied={copied} />
+        <SuccessScreen
+          orderId={orderId}
+          payMethod={payMethod}
+          total={total}
+          onCopy={handleCopy}
+          copied={copied}
+          customer={savedCustomer}
+          items={savedItems}
+        />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left: Form or Payment */}
           <div className="lg:col-span-2">
             {step === "info" && (
               <InfoStep form={form} setForm={setForm} onNext={() => setStep("payment")} />
@@ -170,8 +182,6 @@ export default function CheckoutPage() {
               />
             )}
           </div>
-
-          {/* Right: Order summary */}
           <div className="lg:col-span-1">
             <OrderSummary items={items} subtotal={totalPrice()} delivery={DELIVERY_FEE} total={total} />
           </div>
@@ -364,7 +374,6 @@ function PaymentStep({
         ))}
       </div>
 
-      {/* Bank info */}
       {(payMethod === "khanbank" || payMethod === "golomt") && (
         <div className="bg-gray-50 rounded-xl p-4 mb-5 border border-dashed border-gray-200">
           <p className="text-xs text-gray-500 mb-2">Дансны мэдээлэл</p>
@@ -472,12 +481,31 @@ function OrderSummary({
 
 /* ─── Success Screen ─── */
 function SuccessScreen({
-  orderId, payMethod, total, onCopy, copied,
+  orderId, payMethod, total, onCopy, copied, customer, items,
 }: {
   orderId: string; payMethod: PayMethod; total: number;
   onCopy: (t: string) => void; copied: boolean;
+  customer: any; items: any[];
 }) {
   const method = PAYMENT_METHODS.find((m) => m.id === payMethod)!;
+  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [verifySent, setVerifySent] = useState(false);
+
+  const handleVerifyPayment = async () => {
+    setVerifyLoading(true);
+    try {
+      await fetch("/api/verify-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, customer, total, payMethod, items }),
+      });
+      setVerifySent(true);
+    } catch (e) {
+      console.error("Verify error:", e);
+    } finally {
+      setVerifyLoading(false);
+    }
+  };
 
   return (
     <div className="max-w-lg mx-auto text-center py-12">
@@ -523,6 +551,32 @@ function SuccessScreen({
           </p>
         </div>
       )}
+
+      {/* ✅ Төлбөр шалгах товч */}
+      <div className="bg-white rounded-2xl p-5 mb-6 border border-gray-200 shadow-sm">
+        <p className="text-sm font-semibold text-gray-800 mb-1">Төлбөр төлсөн үү?</p>
+        <p className="text-xs text-gray-500 mb-4">
+          Төлбөр шилжүүлсний дараа доорх товч дарж манай багийг мэдэгдэнэ үү
+        </p>
+        {verifySent ? (
+          <div className="flex items-center justify-center gap-2 py-3 bg-green-50 rounded-xl border border-green-200">
+            <CheckCircle size={18} className="text-green-500" />
+            <span className="text-green-700 font-semibold text-sm">Мэдэгдэл илгээгдлээ!</span>
+          </div>
+        ) : (
+          <button
+            onClick={handleVerifyPayment}
+            disabled={verifyLoading}
+            className="w-full flex items-center justify-center gap-2 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-bold rounded-xl transition-colors text-sm"
+          >
+            {verifyLoading ? (
+              <><Loader2 size={16} className="animate-spin" /> Илгээж байна...</>
+            ) : (
+              <><Send size={16} /> Төлбөр шалгах хүсэлт илгээх</>
+            )}
+          </button>
+        )}
+      </div>
 
       <div className="bg-green-50 rounded-xl p-4 border border-green-100">
         <p className="text-xs text-green-700">

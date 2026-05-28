@@ -22,16 +22,18 @@ enum OrderStatus {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  name          String
-  email         String         @unique
-  passwordHash  String
-  role          Role           @default(BUYER)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  vendorProfile VendorProfile?
-  orders        Order[]
-  cart          Cart?
+  id                String         @id @default(uuid())
+  name              String
+  email             String         @unique
+  passwordHash      String
+  role              Role           @default(BUYER)
+  phone             String?
+  marketingConsent  Boolean        @default(true)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  vendorProfile     VendorProfile?
+  orders            Order[]
+  cart              Cart?
 }
 
 model VendorProfile {

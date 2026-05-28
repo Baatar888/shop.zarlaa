@@ -25,7 +25,6 @@ export default function ProductDetailPage({ params }: Props) {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [lightbox, setLightbox] = useState(false);
 
-  // Zoom state
   const [zooming, setZooming] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
   const imgContainerRef = useRef<HTMLDivElement>(null);
@@ -46,7 +45,6 @@ export default function ProductDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-gray-400 mb-6">
         <Link href="/" className="hover:text-gray-600">Нүүр</Link>
         <span>/</span>
@@ -60,9 +58,7 @@ export default function ProductDetailPage({ params }: Props) {
       </nav>
 
       <div className="grid lg:grid-cols-2 gap-10 mb-16">
-        {/* ─── Image Gallery ─── */}
         <div className="flex gap-3">
-          {/* Thumbnails */}
           {images.length > 1 && (
             <div className="flex flex-col gap-2 w-16 flex-shrink-0">
               {images.map((img, i) => (
@@ -81,7 +77,6 @@ export default function ProductDetailPage({ params }: Props) {
             </div>
           )}
 
-          {/* Main image with zoom */}
           <div
             ref={imgContainerRef}
             className="relative flex-1 aspect-square rounded-2xl overflow-hidden bg-gray-100 select-none"
@@ -91,7 +86,6 @@ export default function ProductDetailPage({ params }: Props) {
             onMouseMove={handleMouseMove}
             onClick={() => { if (!zooming) setLightbox(true); }}
           >
-            {/* Normal image */}
             <Image
               src={primaryImage}
               alt={product.title}
@@ -100,8 +94,6 @@ export default function ProductDetailPage({ params }: Props) {
               sizes="(max-width:1024px) 100vw, 45vw"
               draggable={false}
             />
-
-            {/* Zoomed image layer */}
             {zooming && (
               <div
                 className="absolute inset-0"
@@ -113,13 +105,11 @@ export default function ProductDetailPage({ params }: Props) {
                 }}
               />
             )}
-
             {discount > 0 && (
               <span className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-lg z-10">
                 -{discount}%
               </span>
             )}
-
             {images.length > 1 && !zooming && (
               <>
                 <button
@@ -150,7 +140,6 @@ export default function ProductDetailPage({ params }: Props) {
           </div>
         </div>
 
-        {/* ─── Product Info ─── */}
         <div className="space-y-5">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -165,7 +154,6 @@ export default function ProductDetailPage({ params }: Props) {
             </button>
           </div>
 
-          {/* Price */}
           <div className="flex items-baseline gap-3 flex-wrap">
             <span className="text-3xl font-black text-gray-950">{formatPrice(product.salePrice)}</span>
             {discount > 0 && (
@@ -178,7 +166,6 @@ export default function ProductDetailPage({ params }: Props) {
             )}
           </div>
 
-          {/* Stock */}
           <div className="flex items-center gap-2">
             <div className={`w-2.5 h-2.5 rounded-full ${product.stock > 0 ? "bg-green-500" : "bg-red-400"}`} />
             <span className="text-sm text-gray-600">
@@ -191,7 +178,6 @@ export default function ProductDetailPage({ params }: Props) {
             )}
           </div>
 
-          {/* Sizes */}
           {product.sizes && product.sizes.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -216,7 +202,6 @@ export default function ProductDetailPage({ params }: Props) {
             </div>
           )}
 
-          {/* Colors */}
           {product.colors && product.colors.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -241,7 +226,6 @@ export default function ProductDetailPage({ params }: Props) {
             </div>
           )}
 
-          {/* Description */}
           {product.description && (
             <div className="bg-gray-50 rounded-xl p-4">
               <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
@@ -250,7 +234,6 @@ export default function ProductDetailPage({ params }: Props) {
 
           <AddToCartButton product={product} />
 
-          {/* Badges */}
           <div className="grid grid-cols-3 gap-3 pt-4 border-t border-gray-100">
             {[
               { icon: <Truck size={18} />, title: "Хүргэлт", desc: "Улаанбаатарт 1-2 өдөр" },
@@ -267,7 +250,6 @@ export default function ProductDetailPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Related */}
       {related.length > 0 && (
         <div>
           <h2 className="text-xl font-bold text-gray-950 mb-5">Холбоотой бараанууд</h2>
@@ -298,7 +280,6 @@ export default function ProductDetailPage({ params }: Props) {
         </div>
       )}
 
-      {/* Lightbox */}
       {lightbox && (
         <div
           className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"

@@ -11,6 +11,7 @@ type SearchParams = {
   minPrice?: string;
   maxPrice?: string;
   page?: string;
+  featured?: string;
 };
 
 const SORT_OPTIONS = [
@@ -31,19 +32,19 @@ const CATEGORIES = [
   { name: "Автомашин", slug: "auto" },
 ];
 
-export default async function ProductsPage({
+export default function ProductsPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  const { q, category, sort = "newest", minPrice, maxPrice, page = "1" } = searchParams;
+  const resolvedParams = searchParams;
+  const { q, category, sort = "newest", minPrice, maxPrice, page = "1" } = resolvedParams;
 
   const PAGE_SIZE = 20;
   const currentPage = parseInt(page);
 
   let products = [...MOCK_PRODUCTS];
 
-  // Filter by search query
   if (q) {
     const lower = q.toLowerCase();
     products = products.filter(
@@ -53,16 +54,13 @@ export default async function ProductsPage({
     );
   }
 
-  // Filter by category
   if (category) {
     products = products.filter((p) => p.category.slug === category);
   }
 
-  // Filter by price
   if (minPrice) products = products.filter((p) => p.salePrice >= parseFloat(minPrice));
   if (maxPrice) products = products.filter((p) => p.salePrice <= parseFloat(maxPrice));
 
-  // Sort
   if (sort === "price_asc") products.sort((a, b) => a.salePrice - b.salePrice);
   else if (sort === "price_desc") products.sort((a, b) => b.salePrice - a.salePrice);
   else if (sort === "discount")
@@ -77,7 +75,6 @@ export default async function ProductsPage({
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const paginated = products.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
-  // Category counts
   const categoryCounts = CATEGORIES.map((cat) => ({
     ...cat,
     count: MOCK_PRODUCTS.filter((p) => p.category.slug === cat.slug).length,
@@ -86,12 +83,10 @@ export default async function ProductsPage({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Sidebar filters */}
         <aside className="w-full lg:w-56 flex-shrink-0">
           <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-5 sticky top-24">
             <h2 className="font-bold text-gray-950">Шүүлтүүр</h2>
 
-            {/* Categories */}
             <div>
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                 Ангилал
@@ -125,7 +120,6 @@ export default async function ProductsPage({
               </div>
             </div>
 
-            {/* Price range */}
             <div>
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                 Үнийн хязгаар
@@ -161,13 +155,11 @@ export default async function ProductsPage({
           </div>
         </aside>
 
-        {/* Main content */}
         <div className="flex-1">
-          {/* Sort bar */}
           <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
             <p className="text-sm text-gray-500">
               {total.toLocaleString()} бараа олдлоо
-              {q && <span className="font-medium text-gray-700"> — "{q}"</span>}
+              {q && <span className="font-medium text-gray-700"> — &quot;{q}&quot;</span>}
             </p>
             <div className="flex gap-2">
               {SORT_OPTIONS.map((opt) => (
@@ -190,7 +182,6 @@ export default async function ProductsPage({
 
           <ProductGrid products={paginated} />
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-10">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (

@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import ScrollToTop from "@/components/layout/ScrollToTop";
+import NewProductNotification from "@/components/layout/NewProductNotification";
+import SessionProvider from "@/components/providers/SessionProvider";
 
 export const metadata: Metadata = {
   title: {
@@ -20,9 +23,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="mn">
       <body className="antialiased bg-gray-50 font-sans">
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+        <SessionProvider>
+          <Navbar />
+          <main className="min-h-screen">{children}</main>
+          <Footer />
+          <ScrollToTop />
+          <NewProductNotification />
+        </SessionProvider>
       </body>
     </html>
   );
