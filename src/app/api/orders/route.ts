@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { prisma } from "@/lib/prisma";
 
 /* ── Helpers ── */
 function genOrderId() {
@@ -25,7 +26,10 @@ const PAY_LABELS: Record<string, string> = {
 /* ── Telegram ── */
 async function sendTelegram(message: string) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatIds = (process.env.TELEGRAM_CHAT_IDS || "").split(",").map((s) => s.trim()).filter(Boolean);
+  const chatIds = (process.env.TELEGRAM_CHAT_IDS || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 
   if (!token || chatIds.length === 0) return;
 
@@ -54,14 +58,11 @@ async function sendEmail(to: string, subject: string, html: string) {
     host: process.env.SMTP_HOST || "smtp.gmail.com",
     port: Number(process.env.SMTP_PORT) || 587,
     secure: false,
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
-    },
+    auth: { user: smtpUser, pass: smtpPass },
   });
 
   await transporter.sendMail({
-    from: `"Gompiers" <${process.env.SMTP_USER}>`,
+    from: `"Zarlaa Shop" <${smtpUser}>`,
     to,
     subject,
     html,
@@ -77,6 +78,35 @@ export async function POST(req: NextRequest) {
     const orderId = genOrderId();
     const now = new Date().toLocaleString("mn-MN", { timeZone: "Asia/Ulaanbaatar" });
     const payLabel = PAY_LABELS[payMethod] || payMethod;
+
+    /* ─ Save order to MongoDB ─ */
+    try {
+      await prisma.order.create({
+        data: {
+          orderId,
+          totalAmount: total,
+          deliveryFee: deliveryFee || 0,
+          status: "PENDING",
+          address: customer.address,
+          phone: customer.phone,
+          customerName: customer.name,
+          district: customer.district,
+          khoroo: customer.khoroo,
+          note: customer.note,
+          payMethod,
+          items: {
+            create: items.map((i: any) => ({
+              title: i.title,
+              quantity: i.quantity,
+              price: i.price,
+            })),
+          },
+        },
+      });
+    } catch (dbErr) {
+      console.error("Order DB save failed:", dbErr);
+      // Continue anyway — still send notifications
+    }
 
     /* ─ Build item list text ─ */
     const itemLines = items
@@ -123,7 +153,6 @@ ${itemLines}
         <p style="color:#92400e;margin:0 0 4px;font-size:12px;">Захиалгын дугаар</p>
         <p style="color:#ea580c;font-size:24px;font-weight:900;margin:0;letter-spacing:2px;">${orderId}</p>
       </div>
-
       <h3 style="color:#374151;font-size:14px;margin:0 0 8px;">👤 Захиалагч</h3>
       <table style="width:100%;font-size:13px;color:#4b5563;margin-bottom:20px;">
         <tr><td style="padding:4px 0;color:#9ca3af;">Нэр</td><td>${customer.name}</td></tr>
@@ -133,15 +162,17 @@ ${itemLines}
         <tr><td style="padding:4px 0;color:#9ca3af;">Хаяг</td><td>${customer.address}</td></tr>
         ${customer.note ? `<tr><td style="padding:4px 0;color:#9ca3af;">Тэмдэглэл</td><td>${customer.note}</td></tr>` : ""}
       </table>
-
       <h3 style="color:#374151;font-size:14px;margin:0 0 8px;">🧾 Бараа</h3>
       <div style="background:#f9fafb;border-radius:10px;padding:12px;margin-bottom:20px;">
-        ${items.map((i: any) => `
+        ${items
+          .map(
+            (i: any) => `
           <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e5e7eb;font-size:13px;">
             <span style="color:#374151;">${i.title} <span style="color:#9ca3af;">×${i.quantity}</span></span>
             <span style="font-weight:700;color:#1f2937;">${formatPrice(i.price * i.quantity)}</span>
-          </div>
-        `).join("")}
+          </div>`
+          )
+          .join("")}
         <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#6b7280;">
           <span>Хүргэлт</span><span>${formatPrice(deliveryFee)}</span>
         </div>
@@ -149,7 +180,6 @@ ${itemLines}
           <span>Нийт</span><span>${formatPrice(total)}</span>
         </div>
       </div>
-
       <div style="background:#eff6ff;border-radius:10px;padding:12px;font-size:13px;color:#1e40af;">
         💳 <strong>Төлбөрийн арга:</strong> ${payLabel}
       </div>
@@ -158,7 +188,6 @@ ${itemLines}
 </body>
 </html>`;
 
-    /* ─ Send notifications ─ */
     const notifEmail = process.env.NOTIFY_EMAIL || "info@zarlaa.com";
 
     const results = await Promise.allSettled([

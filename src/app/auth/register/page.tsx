@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
@@ -8,8 +9,65 @@ import { User, Lock, Mail, Phone } from "lucide-react";
 type Method = "email" | "phone";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [method, setMethod] = useState<Method>("email");
   const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setError("");
+  };
+
+  const handleSubmit = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          email: method === "email" ? form.email : undefined,
+          phone: method === "phone" ? form.phone : undefined,
+          password: form.password,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Алдаа гарлаа");
+        return;
+      }
+
+      // Auto login after register
+      const loginEmail =
+        method === "email" ? form.email : `phone_${form.phone}@zarlaa.local`;
+      const result = await signIn("credentials", {
+        email: loginEmail,
+        password: form.password,
+        redirect: false,
+      });
+
+      if (result?.ok) {
+        router.push("/");
+      } else {
+        router.push("/auth/login");
+      }
+    } catch {
+      setError("Сүлжээний алдаа гарлаа");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
@@ -36,12 +94,11 @@ export default function RegisterPage() {
             className="w-full flex items-center justify-center gap-3 py-3 bg-[#1877F2] hover:bg-[#166FE5] text-white font-semibold rounded-xl transition-colors text-sm"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="white">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
             </svg>
             Facebook-ээр бүртгүүлэх
           </button>
 
-          {/* Divider */}
           <div className="relative flex items-center gap-3">
             <div className="flex-1 h-px bg-gray-200" />
             <span className="text-xs text-gray-400 flex-shrink-0">эсвэл</span>
@@ -72,6 +129,13 @@ export default function RegisterPage() {
             </button>
           </div>
 
+          {/* Error */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-600">
+              {error}
+            </div>
+          )}
+
           {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Нэр</label>
@@ -79,6 +143,9 @@ export default function RegisterPage() {
               <User size={16} className="absolute left-3 top-3 text-gray-400" />
               <input
                 type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
                 placeholder="Таны нэр"
                 className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
               />
@@ -93,6 +160,9 @@ export default function RegisterPage() {
                 <Mail size={16} className="absolute left-3 top-3 text-gray-400" />
                 <input
                   type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
                   placeholder="example@mail.com"
                   className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
                 />
@@ -107,6 +177,9 @@ export default function RegisterPage() {
                 </span>
                 <input
                   type="tel"
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
                   placeholder="8899 0010"
                   maxLength={8}
                   className="flex-1 px-3 py-2.5 border border-gray-200 rounded-r-xl text-sm focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
@@ -123,6 +196,9 @@ export default function RegisterPage() {
               <Lock size={16} className="absolute left-3 top-3 text-gray-400" />
               <input
                 type={show ? "text" : "password"}
+                name="password"
+                value={form.password}
+                onChange={handleChange}
                 placeholder="••••••••"
                 className="w-full pl-9 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
               />
@@ -136,8 +212,12 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <button className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl transition-colors text-sm">
-            Бүртгүүлэх
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full py-3 bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-semibold rounded-xl transition-colors text-sm"
+          >
+            {loading ? "Бүртгэж байна..." : "Бүртгүүлэх"}
           </button>
 
           <p className="text-center text-sm text-gray-500">
